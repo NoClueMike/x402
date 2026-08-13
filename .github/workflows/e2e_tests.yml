@@ -206,33 +206,39 @@ jobs:
       - name: Run E2E tests
         id: e2e
         working-directory: ./e2e
+        env:
+          INPUT_TRANSPORT: ${{ inputs.transport || 'http' }}
+          INPUT_FACILITATORS: ${{ inputs.facilitators || 'go,python,typescript' }}
+          INPUT_SERVERS: ${{ inputs.servers }}
+          INPUT_CLIENTS: ${{ inputs.clients }}
+          INPUT_FAMILIES: ${{ inputs.families }}
+          INPUT_MINIMIZE: ${{ inputs.minimize }}
+          INPUT_VERBOSE: ${{ inputs.verbose }}
         run: |
           ARGS=""
 
           # Apply workflow_dispatch inputs (or defaults)
-          ARGS="$ARGS --transport=${{ inputs.transport || 'http' }}"
-          ARGS="$ARGS --facilitators=${{ inputs.facilitators || 'go,python,typescript' }}"
+          ARGS="$ARGS --transport=$INPUT_TRANSPORT"
+          ARGS="$ARGS --facilitators=$INPUT_FACILITATORS"
 
-          if [ -n "${{ inputs.servers }}" ]; then
-            ARGS="$ARGS --servers=${{ inputs.servers }}"
+          if [ -n "$INPUT_SERVERS" ]; then
+            ARGS="$ARGS --servers=$INPUT_SERVERS"
           fi
 
-          if [ -n "${{ inputs.clients }}" ]; then
-            ARGS="$ARGS --clients=${{ inputs.clients }}"
+          if [ -n "$INPUT_CLIENTS" ]; then
+            ARGS="$ARGS --clients=$INPUT_CLIENTS"
           fi
 
-          if [ -n "${{ inputs.families }}" ]; then
-            ARGS="$ARGS --families=${{ inputs.families }}"
+          if [ -n "$INPUT_FAMILIES" ]; then
+            ARGS="$ARGS --families=$INPUT_FAMILIES"
           fi
 
           # Default to --min and -v when inputs are not provided (e.g. push trigger)
-          MINIMIZE="${{ inputs.minimize }}"
-          if [ "$MINIMIZE" = "true" ] || [ -z "$MINIMIZE" ]; then
+          if [ "$INPUT_MINIMIZE" = "true" ] || [ -z "$INPUT_MINIMIZE" ]; then
             ARGS="$ARGS --min"
           fi
 
-          VERBOSE="${{ inputs.verbose }}"
-          if [ "$VERBOSE" = "true" ]; then
+          if [ "$INPUT_VERBOSE" = "true" ]; then
             ARGS="$ARGS -v"
           fi
 
